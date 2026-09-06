@@ -1,222 +1,143 @@
 local player = game.Players.LocalPlayer
 local players = game:GetService("Players")
-local runService = game:GetService("RunService")
+local playerGui = player:WaitForChild("PlayerGui")
 
--- Create ScreenGui
 local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "ESP_GUI_Mobile"
+screenGui.Name = "SimpleESP"
 screenGui.ResetOnSpawn = false
-screenGui.Parent = player:WaitForChild("PlayerGui")
+screenGui.Parent = playerGui
 
--- Helper: add neon border lines (purple)
-local function addNeonBorder(frame, thickness)
-thickness = thickness or 2
-local color = Color3.fromRGB(200, 0, 255)
-local top = Instance.new("Frame")
-top.Size = UDim2.new(1, 0, 0, thickness)
-top.BackgroundColor3 = color
-top.BorderSizePixel = 0
-top.Parent = frame
-
-```
-local bottom = Instance.new("Frame")
-bottom.Size = UDim2.new(1, 0, 0, thickness)
-bottom.BackgroundColor3 = color
-bottom.BorderSizePixel = 0
-bottom.Position = UDim2.new(0, 0, 1, -thickness)
-bottom.Parent = frame
-
-local left = Instance.new("Frame")
-left.Size = UDim2.new(0, thickness, 1, -thickness*2)
-left.BackgroundColor3 = color
-left.BorderSizePixel = 0
-left.Position = UDim2.new(0, 0, 0, thickness)
-left.Parent = frame
-
-local right = Instance.new("Frame")
-right.Size = UDim2.new(0, thickness, 1, -thickness*2)
-right.BackgroundColor3 = color
-right.BorderSizePixel = 0
-right.Position = UDim2.new(1, -thickness, 0, thickness)
-right.Parent = frame
-```
-
-end
-
--- Main menu (large – mobile‑scaled)
-local mainMenu = Instance.new("Frame")
-mainMenu.Size = UDim2.new(0, 280, 0, 200)   -- slightly smaller for mobile
-mainMenu.Position = UDim2.new(0.5, -140, 0.5, -100)
-mainMenu.BackgroundColor3 = Color3.new(0, 0, 0)
-mainMenu.BackgroundTransparency = 0
-mainMenu.BorderSizePixel = 0
-mainMenu.ClipsDescendants = true
-mainMenu.Active = true
-mainMenu.Draggable = true
-mainMenu.Parent = screenGui
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 150, 0, 80)
+frame.Position = UDim2.new(0.5, -75, 0.5, -40)
+frame.BackgroundColor3 = Color3.new(0, 0, 0)
+frame.BackgroundTransparency = 0
+frame.BorderSizePixel = 0
+frame.Active = true
+frame.Draggable = true
+frame.Parent = screenGui
 
 local corner = Instance.new("UICorner")
 corner.CornerRadius = UDim.new(0, 12)
-corner.Parent = mainMenu
-addNeonBorder(mainMenu, 2)
+corner.Parent = frame
 
--- Minimize button (top right)
-local minBtn = Instance.new("TextButton")
-minBtn.Size = UDim2.new(0, 44, 0, 44)   -- mobile touch friendly
-minBtn.Position = UDim2.new(1, -50, 0, 5)
-minBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-minBtn.Text = "−"
-minBtn.TextColor3 = Color3.new(1,1,1)
-minBtn.Font = Enum.Font.SourceSansBold
-minBtn.TextSize = 30
-minBtn.BorderSizePixel = 0
-minBtn.Parent = mainMenu
+local function addBorder(f)
+local c = Color3.fromRGB(200, 0, 255)
+local t = Instance.new("Frame")
+t.Size = UDim2.new(1, 0, 0, 2)
+t.BackgroundColor3 = c
+t.BorderSizePixel = 0
+t.Parent = f
+local b = Instance.new("Frame")
+b.Size = UDim2.new(1, 0, 0, 2)
+b.BackgroundColor3 = c
+b.BorderSizePixel = 0
+b.Position = UDim2.new(0, 0, 1, -2)
+b.Parent = f
+local l = Instance.new("Frame")
+l.Size = UDim2.new(0, 2, 1, -4)
+l.BackgroundColor3 = c
+l.BorderSizePixel = 0
+l.Position = UDim2.new(0, 0, 0, 2)
+l.Parent = f
+local r = Instance.new("Frame")
+r.Size = UDim2.new(0, 2, 1, -4)
+r.BackgroundColor3 = c
+r.BorderSizePixel = 0
+r.Position = UDim2.new(1, -2, 0, 2)
+r.Parent = f
+end
+addBorder(frame)
 
--- ESP button (center)
-local espBtn = Instance.new("TextButton")
-espBtn.Size = UDim2.new(0, 140, 0, 50)
-espBtn.Position = UDim2.new(0.5, -70, 0.5, -25)
-espBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-espBtn.Text = "ESP"
-espBtn.TextColor3 = Color3.new(1,1,1)
-espBtn.Font = Enum.Font.SourceSansBold
-espBtn.TextSize = 28
-espBtn.BorderSizePixel = 0
-espBtn.Parent = mainMenu
+local label = Instance.new("TextLabel")
+label.Size = UDim2.new(1, 0, 0, 30)
+label.Position = UDim2.new(0, 0, 0, 5)
+label.BackgroundTransparency = 1
+label.Text = "ESP OFF"
+label.TextColor3 = Color3.new(1, 1, 1)
+label.Font = Enum.Font.SourceSansBold
+label.TextSize = 18
+label.Parent = frame
 
--- ESP menu (smaller)
-local espMenu = Instance.new("Frame")
-espMenu.Size = UDim2.new(0, 200, 0, 150)
-espMenu.Position = UDim2.new(0.5, -100, 0.5, -75)
-espMenu.BackgroundColor3 = Color3.new(0, 0, 0)
-espMenu.BackgroundTransparency = 0
-espMenu.BorderSizePixel = 0
-espMenu.ClipsDescendants = true
-espMenu.Active = true
-espMenu.Draggable = true
-espMenu.Visible = false
-espMenu.Parent = screenGui
+local toggleBtn = Instance.new("TextButton")
+toggleBtn.Size = UDim2.new(0, 100, 0, 35)
+toggleBtn.Position = UDim2.new(0.5, -50, 1, -40)
+toggleBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+toggleBtn.Text = "Toggle ESP"
+toggleBtn.TextColor3 = Color3.new(1, 1, 1)
+toggleBtn.Font = Enum.Font.SourceSansBold
+toggleBtn.TextSize = 16
+toggleBtn.BorderSizePixel = 0
+toggleBtn.Parent = frame
 
-local espCorner = Instance.new("UICorner")
-espCorner.CornerRadius = UDim.new(0, 12)
-espCorner.Parent = espMenu
-addNeonBorder(espMenu, 2)
-
--- Back button (top right)
-local backBtn = Instance.new("TextButton")
-backBtn.Size = UDim2.new(0, 44, 0, 44)
-backBtn.Position = UDim2.new(1, -50, 0, 5)
-backBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-backBtn.Text = "←"
-backBtn.TextColor3 = Color3.new(1,1,1)
-backBtn.Font = Enum.Font.SourceSansBold
-backBtn.TextSize = 30
-backBtn.BorderSizePixel = 0
-backBtn.Parent = espMenu
-
--- Toggle ESP button (center)
-local toggleEspBtn = Instance.new("TextButton")
-toggleEspBtn.Size = UDim2.new(0, 140, 0, 50)
-toggleEspBtn.Position = UDim2.new(0.5, -70, 0.5, -25)
-toggleEspBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-toggleEspBtn.Text = "Open ESP"
-toggleEspBtn.TextColor3 = Color3.new(1,1,1)
-toggleEspBtn.Font = Enum.Font.SourceSansBold
-toggleEspBtn.TextSize = 22
-toggleEspBtn.BorderSizePixel = 0
-toggleEspBtn.Parent = espMenu
-
--- States
 local espActive = false
-local highlightedPlayers = {}
-local isMinimized = false
-local originalSize = mainMenu.Size
+local highlights = {}
 
--- Highlight update function
-local function updatePlayerHighlight(plr)
+local function updatePlayer(plr)
 if espActive then
 local char = plr.Character
 if char then
-local highlight = Instance.new("Highlight")
-highlight.OutlineColor = Color3.new(1,1,1)
-highlight.FillColor = Color3.fromRGB(180, 0, 255)
-highlight.FillTransparency = 0.5
-highlight.OutlineTransparency = 0
-highlight.Parent = char
-highlightedPlayers[plr] = highlight
+local h = Instance.new("Highlight")
+h.OutlineColor = Color3.new(1, 1, 1)
+h.FillColor = Color3.fromRGB(180, 0, 255)
+h.FillTransparency = 0.4
+h.OutlineTransparency = 0
+h.Parent = char
+highlights[plr] = h
 end
 else
-local old = highlightedPlayers[plr]
-if old then
-old:Destroy()
-highlightedPlayers[plr] = nil
+local h = highlights[plr]
+if h then
+h:Destroy()
+highlights[plr] = nil
 end
 end
 end
 
-local function applyToAll()
+local function refreshAll()
 for _, plr in ipairs(players:GetPlayers()) do
 if plr ~= player then
-updatePlayerHighlight(plr)
+updatePlayer(plr)
 end
 end
 end
 
 local function toggleESP()
 espActive = not espActive
-toggleEspBtn.BackgroundColor3 = espActive and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(80, 80, 80)
-toggleEspBtn.Text = espActive and "ESP ON" or "Open ESP"
-applyToAll()
+label.Text = espActive and "ESP ON" or "ESP OFF"
+toggleBtn.BackgroundColor3 = espActive and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(80, 80, 80)
+refreshAll()
 end
 
--- Button connections
-espBtn.MouseButton1Click:Connect(function()
-mainMenu.Visible = false
-espMenu.Visible = true
-end)
+toggleBtn.MouseButton1Click:Connect(toggleESP)
 
-backBtn.MouseButton1Click:Connect(function()
-espMenu.Visible = false
-mainMenu.Visible = true
-end)
-
-toggleEspBtn.MouseButton1Click:Connect(toggleESP)
-
-minBtn.MouseButton1Click:Connect(function()
-isMinimized = not isMinimized
-if isMinimized then
-mainMenu.Size = UDim2.new(0, 100, 0, 50)
-espBtn.Visible = false
-minBtn.Text = "+"
-else
-mainMenu.Size = originalSize
-espBtn.Visible = true
-minBtn.Text = "−"
-end
-end)
-
--- Handle new players
 local function onPlayerAdded(plr)
-if plr ~= player then
-local function onChar(char)
+if plr == player then return end
+local function onChar()
 wait(0.2)
-if espActive then updatePlayerHighlight(plr) end
+if espActive then updatePlayer(plr) end
 end
 plr.CharacterAdded:Connect(onChar)
-if plr.Character then onChar(plr.Character) end
+if plr.Character then
+wait(0.2)
+if espActive then updatePlayer(plr) end
 end
 end
 
 players.PlayerAdded:Connect(onPlayerAdded)
+
 for _, plr in ipairs(players:GetPlayers()) do
 if plr ~= player then
-local function onChar(char)
+local function onChar()
 wait(0.2)
-if espActive then updatePlayerHighlight(plr) end
+if espActive then updatePlayer(plr) end
 end
 plr.CharacterAdded:Connect(onChar)
-if plr.Character then onChar(plr.Character) end
+if plr.Character then
+wait(0.2)
+if espActive then updatePlayer(plr) end
+end
 end
 end
 
-print("Mobile ESP GUI loaded. Touch the buttons to control.")
+print("Simple ESP loaded.")
